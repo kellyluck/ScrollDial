@@ -35,10 +35,10 @@ public partial class Form1 : Form
             lblCurrentApp.Text = currentApp.Name;
         }
 
+        // quick dumb proof of concept: if current foreground app is notepad, type in the time.
         if (currentApp.Name.ToLower() == "notepad")
         {
             SendToNotepad(currentApp.ProcessID, DateTime.Now.ToShortTimeString() + "\n");
-
         }
     }
 

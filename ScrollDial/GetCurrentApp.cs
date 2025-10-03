@@ -10,13 +10,8 @@ internal static class GetCurrentApp
     static extern int GetForegroundWindow();
 
     [DllImport("user32.dll")]
-    static extern int GetWindowText(int hWnd, StringBuilder text, int count);
-
-    [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    private static string lastTitle = "";
-    private static int lastHandle;
     private static CurrentApp currentApp = new CurrentApp() { Name = "" };
 
     public static CurrentApp GetActiveWindow()
@@ -35,7 +30,7 @@ internal static class GetCurrentApp
         {
             try
             {
-                Process process = Process.GetProcessById((int)processId);
+                Process process = Process.GetProcessById((int)processId); // le sigh
                 Console.WriteLine($"Process Name: {process.ProcessName}");
                 currentApp.Name = process.ProcessName;
                 currentApp.ProcessID = (int)processId;
