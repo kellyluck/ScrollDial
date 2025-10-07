@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Timers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using Timer = System.Timers.Timer;
@@ -27,8 +26,8 @@ public partial class Form1 : Form
         timer.AutoReset = true;
         timer.Enabled = true;
 
-        LoadProcessList();
         LoadSettings();
+        LoadProcessList();
     }
 
     public void LoadProcessList()
@@ -42,10 +41,7 @@ public partial class Form1 : Form
             .ToList();
         foreach (var process in allProcesses)
         {
-            if (process.ProcessName != "svchost")
-            {
-                lstProcesses.Items.Add(process.ProcessName);
-            }
+            lstProcesses.Items.Add(process.ProcessName);
         }
     }
 
@@ -157,7 +153,7 @@ public partial class Form1 : Form
             return;
         }
 
-        string json=File.ReadAllText(settingsFile);
+        string json = File.ReadAllText(settingsFile);
         dialSettings = JsonConvert.DeserializeObject<List<ProcessDialSettings>>(json);
     }
 
