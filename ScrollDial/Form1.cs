@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.IO.Ports;
 using System.Text.Json;
 using System.Timers;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -12,6 +13,7 @@ public partial class Form1 : Form
     List<ProcessDialSettings> dialSettings = new List<ProcessDialSettings>();
     ProcessDialSettings currentSetting;
     string settingsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "keysettings.json");
+    SerialPort serialPort = new SerialPort();
 
     public Form1()
     {
@@ -21,6 +23,8 @@ public partial class Form1 : Form
 
     public void Startup()
     {
+        InitSerialPort();
+
         Timer timer = new Timer(1000);
         timer.Elapsed += CheckCurrentApp;
         timer.AutoReset = true;
@@ -28,6 +32,47 @@ public partial class Form1 : Form
 
         LoadSettings();
         LoadProcessList();
+    }
+
+    private void InitSerialPort()
+    {
+        serialPort.BaudRate = 9600;
+        serialPort.PortName = "COM4";
+        serialPort.Open();
+        serialPort.DataReceived += SerialPort_DataReceived;
+    }
+
+    private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+    {
+        string dialInput = serialPort.ReadLine();
+        CurrentApp currentApp = GetCurrentApp.GetActiveWindow();
+
+        var currentSettings = dialSettings.FirstOrDefault(d => d.ProcessName == currentApp.Name);
+        if (currentSettings != null)
+        {
+            KeyEventArgs keystroke = null;
+            switch (dialInput)
+            {
+                case "CW|Y":
+                    if (currentSettings.CW_Button != null) keystroke = currentSettings.CW_Button;
+                    break;
+                case "CCW|Y":
+                    if (currentSettings.CCW_Button != null) keystroke = currentSettings.CCW_Button;
+                    break;
+                case "CW|N":
+                    if (currentSettings.CW_NoButton != null) keystroke = currentSettings.CW_NoButton;
+                    break;
+                case "CCW|N":
+                    if (currentSettings.CCW_NoButton != null) keystroke = currentSettings.CCW_NoButton;
+                    break;
+                default:
+                    break;
+            }
+            if (keystroke != null)
+            {
+                SendToProcess(currentApp.ProcessID, keystroke);
+            }
+        }
     }
 
     public void LoadProcessList()
@@ -61,19 +106,19 @@ public partial class Form1 : Form
         }
 
         // quick dumb proof of concept: if current foreground app is notepad, type in the time.
-        if (currentApp.Name.ToLower() == "notepad")
-        {
-            SendToNotepad(currentApp.ProcessID, DateTime.Now.ToShortTimeString() + "\n");
-        }
+        //if (currentApp.Name.ToLower() == "notepad")
+        //{
+        //    SendToNotepad(currentApp.ProcessID, DateTime.Now.ToShortTimeString() + "\n");
+        //}
     }
 
-    public void SendToNotepad(int processID, string note)
+    public void SendToProcess(int processID, KeyEventArgs keystroke)
     {
         Process p = Process.GetProcessById(processID);
         if (p != null)
         {
             IntPtr h = p.MainWindowHandle;
-            SendKeys.Send(note);
+            //SendKeys.Send(note);
         }
     }
 
