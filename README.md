@@ -4,6 +4,7 @@ Being a born over-engineer, natchally I decided to make it more general purpose,
 
 Things to do yet:
 * Make sure the code can send combo keys (alt-X, ctl-Y, etc)
+* Make a full BOM
 
 Incidentally, the grind crank has had at least one real-life instance: https://jargonfile.johnswitzerland.com/grind-crank.html
 (the link referenced in the entry is dead btw, use this one: https://web.archive.org/web/20150101044158/http://www.cs.rice.edu/History/R1/ - it's quite the read.)
